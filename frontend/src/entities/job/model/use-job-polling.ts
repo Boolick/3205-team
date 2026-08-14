@@ -10,18 +10,20 @@ const TERMINAL_STATUSES: JobStatus[] = ['completed', 'cancelled', 'failed'];
  * - Aborts in-flight requests on activeJobId change or unmount.
  * - Pauses polling when the browser tab is hidden and refetches when visible.
  * - Stops polling when reaching terminal status (completed, cancelled, failed).
- * - Triggers background fetchJobs() when active job finishes.
+ * - Triggers background fetchJobs() and Toast notifications when active job finishes.
  */
 export function useJobPolling(): void {
   const activeJobId = useJobStore((state) => state.activeJobId);
-  const activeJobStatus = useJobStore((state) => state.activeJob?.status);
+  const activeJob = useJobStore((state) => state.activeJob);
+  const activeJobStatus = activeJob?.status;
   const fetchActiveJob = useJobStore((state) => state.fetchActiveJob);
   const fetchJobs = useJobStore((state) => state.fetchJobs);
+  const addToast = useJobStore((state) => state.addToast);
 
   const prevStatusRef = useRef<JobStatus | undefined>(activeJobStatus);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Background sync on status transition to terminal
+  // Background sync and notification on status transition to terminal
   useEffect(() => {
     if (
       activeJobStatus &&
@@ -31,9 +33,24 @@ export function useJobPolling(): void {
     ) {
       // Transitioned into terminal state -> refresh global jobs list
       fetchJobs();
+
+      // Show completion toast notification
+      const shortId = activeJobId?.slice(0, 8) || '';
+      if (activeJobStatus === 'completed') {
+        const successCount = activeJob?.items.filter((i) => i.status === 'success').length ?? 0;
+        const totalCount = activeJob?.items.length ?? 0;
+        addToast(
+          'success',
+          `Задание #${shortId} завершено: ${successCount} из ${totalCount} URL успешно`
+        );
+      } else if (activeJobStatus === 'failed') {
+        addToast('error', `Задание #${shortId} завершилось с ошибками`);
+      } else if (activeJobStatus === 'cancelled') {
+        addToast('info', `Задание #${shortId} отменено`);
+      }
     }
     prevStatusRef.current = activeJobStatus;
-  }, [activeJobStatus, fetchJobs]);
+  }, [activeJobStatus, activeJob, activeJobId, fetchJobs, addToast]);
 
   // Polling loop
   useEffect(() => {

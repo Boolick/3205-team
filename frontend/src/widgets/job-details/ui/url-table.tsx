@@ -1,6 +1,7 @@
 import { ExternalLink, AlertCircle, CheckCircle2, Clock, XCircle, Loader2 } from 'lucide-react';
 import { JobItem, JobItemStatus } from '../../../entities/job';
 import { cn } from '../../../shared/lib/utils';
+import { CopyButton } from '../../../shared/ui';
 
 interface UrlTableProps {
   items: JobItem[];
@@ -41,8 +42,8 @@ const ITEM_STATUS_LABELS: Record<JobItemStatus, string> = {
 
 export function UrlTable({ items, emptyMessage = 'Нет ссылок с выбранным статусом' }: UrlTableProps) {
   return (
-    <div className="border border-[#262626] rounded-[6px] overflow-hidden bg-[#111111]">
-      <div className="overflow-x-auto max-h-[460px]">
+    <div className="border border-[#262626] rounded-[6px] overflow-hidden bg-[#111111] shadow-inner">
+      <div className="overflow-x-auto max-h-[460px] scrollbar-thin scrollbar-thumb-[#262626]">
         <table className="w-full text-left text-[12px] border-collapse font-sans">
           <thead className="bg-[#1a1a1a] border-b border-[#262626] sticky top-0 z-10 text-[11px] text-[#a4a19b] uppercase tracking-wider font-mono">
             <tr>
@@ -65,7 +66,7 @@ export function UrlTable({ items, emptyMessage = 'Нет ссылок с выб�
               items.map((item, index) => (
                 <tr
                   key={`${item.url}-${index}`}
-                  className="hover:bg-[#1a1a1a]/60 transition-colors group"
+                  className="hover:bg-[#1a1a1a]/80 transition-colors group"
                 >
                   {/* Index */}
                   <td className="py-2.5 px-3 text-center text-[#5e5d59] font-mono text-[11px]">
@@ -82,17 +83,26 @@ export function UrlTable({ items, emptyMessage = 'Нет ссылок с выб�
                     </div>
                   </td>
 
-                  {/* URL */}
-                  <td className="py-2.5 px-3 font-mono text-[12px] text-[#eeeeee] break-all max-w-[280px]">
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="inline-flex items-center gap-1.5 hover:text-[#2b7fff] hover:underline transition-colors"
-                    >
-                      <span>{item.url}</span>
-                      <ExternalLink className="w-3 h-3 text-[#5e5d59] group-hover:text-[#2b7fff] shrink-0" />
-                    </a>
+                  {/* URL + Copy Action */}
+                  <td className="py-2.5 px-3 font-mono text-[12px] text-[#eeeeee] max-w-[280px]">
+                    <div className="flex items-center gap-1.5 justify-between">
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex items-center gap-1.5 hover:text-[#2b7fff] hover:underline transition-colors truncate"
+                      >
+                        <span className="truncate">{item.url}</span>
+                        <ExternalLink className="w-3 h-3 text-[#5e5d59] group-hover:text-[#2b7fff] shrink-0" />
+                      </a>
+                      <CopyButton
+                        text={item.url}
+                        label=""
+                        showTooltip={true}
+                        iconClassName="w-3 h-3"
+                        className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity shrink-0"
+                      />
+                    </div>
                   </td>
 
                   {/* HTTP Code */}

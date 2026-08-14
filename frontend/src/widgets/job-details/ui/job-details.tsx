@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Copy, Check, Sparkles, Activity } from 'lucide-react';
+import { Sparkles, Activity } from 'lucide-react';
 import { useJobStore, JobStatus } from '../../../entities/job';
 import { CancelJobButton } from '../../../features/cancel-job';
 import {
@@ -8,7 +8,8 @@ import {
   getJobUrlCounts,
   FilterStatus,
 } from '../../../features/filter-job-urls';
-import { Badge } from '../../../shared/ui';
+import { Badge, CopyButton } from '../../../shared/ui';
+import { ProgressBar } from './progress-bar';
 import { UrlTable } from './url-table';
 
 const STATUS_TITLES: Record<JobStatus, string> = {
@@ -20,18 +21,10 @@ const STATUS_TITLES: Record<JobStatus, string> = {
 };
 
 export function JobDetails() {
-  const { activeJob, activeJobId, isLoadingActiveJob } = useJobStore();
+  const { activeJob, isLoadingActiveJob } = useJobStore();
 
-  const [hasCopiedId, setHasCopiedId] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<FilterStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
-
-  const handleCopyId = () => {
-    if (!activeJobId) return;
-    navigator.clipboard.writeText(activeJobId);
-    setHasCopiedId(true);
-    setTimeout(() => setHasCopiedId(false), 2000);
-  };
 
   // Filter items using the extracted feature helper
   const counts = useMemo(
@@ -90,17 +83,15 @@ export function JobDetails() {
   const total = activeJob.items.length;
   const successCount = counts.success;
   const errorCount = counts.error;
-  const processedCount = successCount + errorCount;
   const inProgressCount = counts.in_progress;
   const pendingCount = counts.pending;
-  const percent = total > 0 ? Math.round((processedCount / total) * 100) : 0;
 
   return (
-    <div className="bg-[#1f1f1f] border border-[#262626] rounded-[8px] p-6 shadow-sm space-y-6">
+    <div className="bg-[#1f1f1f] border border-[#262626] rounded-[8px] p-6 shadow-sm space-y-6 transition-all duration-200">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#262626]">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <h2 className="font-serif text-[18px] text-[#eeeeee] font-medium">
               {STATUS_TITLES[activeJob.status] || 'Детализация проверки'}
             </h2>
@@ -112,18 +103,7 @@ export function JobDetails() {
             <span className="text-[12px] font-mono text-[#a4a19b]">
               ID: {activeJob.id}
             </span>
-            <button
-              type="button"
-              onClick={handleCopyId}
-              title="Скопировать ID задания"
-              className="p-1 hover:bg-[#262626] text-[#a4a19b] hover:text-[#eeeeee] rounded transition-colors focus:outline-none cursor-pointer"
-            >
-              {hasCopiedId ? (
-                <Check className="w-3.5 h-3.5 text-[#4ade80]" />
-              ) : (
-                <Copy className="w-3.5 h-3.5" />
-              )}
-            </button>
+            <CopyButton text={activeJob.id} label="" showTooltip={true} />
           </div>
         </div>
 
@@ -131,78 +111,45 @@ export function JobDetails() {
         <CancelJobButton />
       </div>
 
-      {/* Progress & Metrics Summary */}
-      <div className="space-y-4">
-        {/* Progress Bar Container */}
-        <div className="bg-[#111111] p-4 rounded-[6px] border border-[#262626] space-y-2.5">
-          <div className="flex items-center justify-between text-[12px] font-mono">
-            <span className="text-[#a4a19b]">
-              Прогресс:{' '}
-              <strong className="text-[#eeeeee] font-medium">
-                {processedCount} из {total} URL проверено
-              </strong>
-            </span>
-            <span className="text-[#2b7fff] font-bold text-[13px]">
-              {percent}%
-            </span>
-          </div>
+      {/* Multi-Segment Progress Bar */}
+      <ProgressBar items={activeJob.items} jobStatus={activeJob.status} />
 
-          <div className="w-full bg-[#1f1f1f] h-2 rounded-full overflow-hidden">
-            <div
-              className={`h-full transition-all duration-300 rounded-full ${
-                activeJob.status === 'failed'
-                  ? 'bg-[#f87171]'
-                  : activeJob.status === 'completed'
-                  ? 'bg-[#4ade80]'
-                  : 'bg-[#2b7fff]'
-              }`}
-              style={{ width: `${percent}%` }}
-            />
-          </div>
-
-          <div className="flex items-center justify-between text-[11px] text-[#5e5d59] font-mono pt-1">
-            <span>Создано: {new Date(activeJob.createdAt).toLocaleString('ru-RU')}</span>
-            <span>Параллельность: 5 потоков</span>
-          </div>
+      {/* 4 Metric Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="bg-[#111111] border border-[#262626] p-3 rounded-[6px]">
+          <span className="text-[11px] font-mono text-[#a4a19b] uppercase tracking-wider block">
+            Всего ссылок
+          </span>
+          <span className="text-[18px] font-mono font-medium text-[#eeeeee] mt-0.5 block">
+            {total}
+          </span>
         </div>
 
-        {/* 4 Metric Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          <div className="bg-[#111111] border border-[#262626] p-3 rounded-[6px]">
-            <span className="text-[11px] font-mono text-[#a4a19b] uppercase tracking-wider block">
-              Всего ссылок
-            </span>
-            <span className="text-[18px] font-mono font-medium text-[#eeeeee] mt-0.5 block">
-              {total}
-            </span>
-          </div>
+        <div className="bg-[#111111] border border-[#1d4d33] p-3 rounded-[6px]">
+          <span className="text-[11px] font-mono text-[#4ade80] uppercase tracking-wider block">
+            Успешно (2xx)
+          </span>
+          <span className="text-[18px] font-mono font-medium text-[#4ade80] mt-0.5 block">
+            {successCount}
+          </span>
+        </div>
 
-          <div className="bg-[#111111] border border-[#1d4d33] p-3 rounded-[6px]">
-            <span className="text-[11px] font-mono text-[#4ade80] uppercase tracking-wider block">
-              Успешно (2xx)
-            </span>
-            <span className="text-[18px] font-mono font-medium text-[#4ade80] mt-0.5 block">
-              {successCount}
-            </span>
-          </div>
+        <div className="bg-[#111111] border border-[#5c1d24] p-3 rounded-[6px]">
+          <span className="text-[11px] font-mono text-[#f87171] uppercase tracking-wider block">
+            Ошибки
+          </span>
+          <span className="text-[18px] font-mono font-medium text-[#f87171] mt-0.5 block">
+            {errorCount}
+          </span>
+        </div>
 
-          <div className="bg-[#111111] border border-[#5c1d24] p-3 rounded-[6px]">
-            <span className="text-[11px] font-mono text-[#f87171] uppercase tracking-wider block">
-              Ошибки
-            </span>
-            <span className="text-[18px] font-mono font-medium text-[#f87171] mt-0.5 block">
-              {errorCount}
-            </span>
-          </div>
-
-          <div className="bg-[#111111] border border-[#262626] p-3 rounded-[6px]">
-            <span className="text-[11px] font-mono text-[#a4a19b] uppercase tracking-wider block">
-              В очереди / Процессе
-            </span>
-            <span className="text-[18px] font-mono font-medium text-[#eeeeee] mt-0.5 block">
-              {inProgressCount + pendingCount}
-            </span>
-          </div>
+        <div className="bg-[#111111] border border-[#262626] p-3 rounded-[6px]">
+          <span className="text-[11px] font-mono text-[#a4a19b] uppercase tracking-wider block">
+            В очереди / Процессе
+          </span>
+          <span className="text-[18px] font-mono font-medium text-[#eeeeee] mt-0.5 block">
+            {inProgressCount + pendingCount}
+          </span>
         </div>
       </div>
 
