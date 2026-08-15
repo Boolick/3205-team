@@ -22,7 +22,7 @@ export async function checkUrl(
     ? AbortSignal.any([jobSignal, timeoutSignal])
     : createCombinedSignal(jobSignal, timeoutSignal);
 
-  let status: "success" | "error" = "error";
+  let status: "success" | "error";
   let httpCode: number | undefined = undefined;
   let errorMessage: string | undefined = undefined;
 
