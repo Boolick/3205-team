@@ -1,19 +1,10 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Body,
-  Param,
-  HttpCode,
-  HttpStatus,
-} from "@nestjs/common";
-import { Throttle } from "@nestjs/throttler";
-import { JobsService } from "./jobs.service";
-import { CreateJobDto } from "./dto/create-job.dto";
-import { Job, JobSummary } from "./interfaces/job.interface";
+import { Controller, Get, Post, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
+import { JobsService } from './jobs.service';
+import { CreateJobDto } from './dto/create-job.dto';
+import { Job, JobSummary } from './interfaces/job.interface';
 
-@Controller("jobs")
+@Controller('jobs')
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
@@ -30,15 +21,15 @@ export class JobsController {
     return this.jobsService.getAllJobs();
   }
 
-  @Get(":id")
+  @Get(':id')
   @Throttle({ short: { limit: 60, ttl: 60000 } })
-  getJobById(@Param("id") id: string): Job {
+  getJobById(@Param('id') id: string): Job {
     return this.jobsService.getJobById(id);
   }
 
-  @Delete(":id")
+  @Delete(':id')
   @Throttle({ short: { limit: 30, ttl: 60000 } })
-  cancelJob(@Param("id") id: string): Job {
+  cancelJob(@Param('id') id: string): Job {
     return this.jobsService.cancelJob(id);
   }
 }

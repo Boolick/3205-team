@@ -24,7 +24,7 @@ export function getJobUrlCounts(items: JobItem[]): Record<FilterStatus, number> 
 export function filterJobUrls(
   items: JobItem[],
   statusFilter: FilterStatus,
-  searchQuery: string
+  searchQuery: string,
 ): JobItem[] {
   const query = searchQuery.toLowerCase().trim();
 

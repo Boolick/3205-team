@@ -32,29 +32,27 @@ export function JobCard({ job, isActive, onSelect }: JobCardProps) {
         }
       }}
       className={cn(
-        'relative p-3.5 rounded-[6px] border transition-all text-left cursor-pointer select-none outline-none group',
+        'group relative cursor-pointer rounded-[6px] border p-3.5 text-left transition-all outline-none select-none',
         isActive
-          ? 'bg-[#262626] border-[#2b7fff] shadow-sm before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[3px] before:bg-[#2b7fff] before:rounded-l-[6px]'
-          : 'bg-[#1a1a1a] border-[#262626] hover:border-[#383838] hover:bg-[#222222]'
+          ? 'border-[#2b7fff] bg-[#262626] shadow-sm before:absolute before:top-0 before:bottom-0 before:left-0 before:w-[3px] before:rounded-l-[6px] before:bg-[#2b7fff]'
+          : 'border-[#262626] bg-[#1a1a1a] hover:border-[#383838] hover:bg-[#222222]',
       )}
     >
-      {/* Top Row: ID + Badge */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <span className="text-[12px] font-mono font-medium text-[#eeeeee]">
+          <span className="font-mono text-[12px] font-medium text-[#eeeeee]">
             #{job.id.slice(0, 8)}
           </span>
         </div>
-        <Badge status={job.status} className="text-[10px] px-1.5 py-0">
+        <Badge status={job.status} className="px-1.5 py-0 text-[10px]">
           {STATUS_LABELS[job.status] || job.status}
         </Badge>
       </div>
 
-      {/* Middle Row: Progress and Counts */}
-      <div className="flex items-center justify-between text-[11px] font-mono">
+      <div className="flex items-center justify-between font-mono text-[11px]">
         <div className="text-[#a4a19b]">
           Прогресс:{' '}
-          <span className="text-[#eeeeee] font-medium">
+          <span className="font-medium text-[#eeeeee]">
             {processedCount}/{job.totalUrls}
           </span>
         </div>
@@ -72,11 +70,10 @@ export function JobCard({ job, isActive, onSelect }: JobCardProps) {
         </div>
       </div>
 
-      {/* Bottom Progress Bar Indicator for ongoing jobs */}
       {!isFinished && (
-        <div className="mt-2.5 w-full bg-[#111111] h-1 rounded-full overflow-hidden">
+        <div className="mt-2.5 h-1 w-full overflow-hidden rounded-full bg-[#111111]">
           <div
-            className="bg-[#2b7fff] h-full transition-all duration-300 rounded-full"
+            className="h-full rounded-full bg-[#2b7fff] transition-all duration-300"
             style={{
               width: `${Math.min(100, Math.round((processedCount / (job.totalUrls || 1)) * 100))}%`,
             }}
@@ -84,12 +81,11 @@ export function JobCard({ job, isActive, onSelect }: JobCardProps) {
         </div>
       )}
 
-      {/* Footer: Date */}
       <div className="mt-2 flex items-center justify-between text-[10px] text-[#5e5d59]">
         <span title={new Date(job.createdAt).toLocaleString('ru-RU')}>
           {formatRelativeTime(job.createdAt)}
         </span>
-        <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#2b7fff] text-[10px]">
+        <span className="text-[10px] text-[#2b7fff] opacity-0 transition-opacity group-hover:opacity-100">
           Открыть →
         </span>
       </div>

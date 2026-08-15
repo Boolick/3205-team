@@ -1,11 +1,5 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from "@nestjs/common";
-import { Response } from "express";
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
 
 export interface ErrorResponseFormat {
   statusCode: number;
@@ -21,27 +15,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = "Internal server error";
+    let message = 'Internal server error';
     let errors: string[] = [];
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
 
-      if (typeof exceptionResponse === "string") {
+      if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
         errors = [exceptionResponse];
-      } else if (
-        typeof exceptionResponse === "object" &&
-        exceptionResponse !== null
-      ) {
+      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
         const respObj = exceptionResponse as Record<string, unknown>;
         const respMsg = respObj.message;
 
         if (Array.isArray(respMsg)) {
           errors = respMsg.map((e) => String(e));
-          message = "Validation failed";
-        } else if (typeof respMsg === "string") {
+          message = 'Validation failed';
+        } else if (typeof respMsg === 'string') {
           message = respMsg;
           errors = [respMsg];
         } else {
@@ -53,7 +44,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message = exception.message;
       errors = [exception.message];
     } else {
-      errors = ["An unknown error occurred"];
+      errors = ['An unknown error occurred'];
     }
 
     const formattedResponse: ErrorResponseFormat = {

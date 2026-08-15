@@ -19,16 +19,16 @@ function getHttpCodeBadgeClass(code?: number) {
 function getItemStatusIcon(status: JobItemStatus) {
   switch (status) {
     case 'success':
-      return <CheckCircle2 className="w-3.5 h-3.5 text-[#4ade80]" />;
+      return <CheckCircle2 className="h-3.5 w-3.5 text-[#4ade80]" />;
     case 'error':
-      return <XCircle className="w-3.5 h-3.5 text-[#f87171]" />;
+      return <XCircle className="h-3.5 w-3.5 text-[#f87171]" />;
     case 'in_progress':
-      return <Loader2 className="w-3.5 h-3.5 text-[#2b7fff] animate-spin" />;
+      return <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2b7fff]" />;
     case 'cancelled':
-      return <AlertCircle className="w-3.5 h-3.5 text-[#5e5d59]" />;
+      return <AlertCircle className="h-3.5 w-3.5 text-[#5e5d59]" />;
     case 'pending':
     default:
-      return <Clock className="w-3.5 h-3.5 text-[#a4a19b]" />;
+      return <Clock className="h-3.5 w-3.5 text-[#a4a19b]" />;
   }
 }
 
@@ -40,25 +40,28 @@ const ITEM_STATUS_LABELS: Record<JobItemStatus, string> = {
   cancelled: 'Отменено',
 };
 
-export function UrlTable({ items, emptyMessage = 'Нет ссылок с выбранным статусом' }: UrlTableProps) {
+export function UrlTable({
+  items,
+  emptyMessage = 'Нет ссылок с выбранным статусом',
+}: UrlTableProps) {
   return (
-    <div className="border border-[#262626] rounded-[6px] overflow-hidden bg-[#111111] shadow-inner">
-      <div className="overflow-x-auto max-h-[460px] scrollbar-thin scrollbar-thumb-[#262626]">
-        <table className="w-full text-left text-[12px] border-collapse font-sans">
-          <thead className="bg-[#1a1a1a] border-b border-[#262626] sticky top-0 z-10 text-[11px] text-[#a4a19b] uppercase tracking-wider font-mono">
+    <div className="overflow-hidden rounded-[6px] border border-[#262626] bg-[#111111] shadow-inner">
+      <div className="max-h-[460px] scrollbar-thin scrollbar-thumb-[#262626] overflow-x-auto">
+        <table className="w-full border-collapse text-left font-sans text-[12px]">
+          <thead className="sticky top-0 z-10 border-b border-[#262626] bg-[#1a1a1a] font-mono text-[11px] tracking-wider text-[#a4a19b] uppercase">
             <tr>
-              <th className="py-2.5 px-3 w-10 text-center">#</th>
-              <th className="py-2.5 px-3 w-28">Статус</th>
-              <th className="py-2.5 px-3">URL</th>
-              <th className="py-2.5 px-3 w-24">HTTP Код</th>
-              <th className="py-2.5 px-3 w-24 text-right">Время</th>
-              <th className="py-2.5 px-3 w-36">Ошибка</th>
+              <th className="w-10 px-3 py-2.5 text-center">#</th>
+              <th className="w-28 px-3 py-2.5">Статус</th>
+              <th className="px-3 py-2.5">URL</th>
+              <th className="w-24 px-3 py-2.5">HTTP Код</th>
+              <th className="w-24 px-3 py-2.5 text-right">Время</th>
+              <th className="w-36 px-3 py-2.5">Ошибка</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#1f1f1f]">
             {items.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-[#5e5d59] font-mono text-[12px]">
+                <td colSpan={6} className="py-8 text-center font-mono text-[12px] text-[#5e5d59]">
                   {emptyMessage}
                 </td>
               </tr>
@@ -66,15 +69,12 @@ export function UrlTable({ items, emptyMessage = 'Нет ссылок с выб�
               items.map((item, index) => (
                 <tr
                   key={`${item.url}-${index}`}
-                  className="hover:bg-[#1a1a1a]/80 transition-colors group"
+                  className="group transition-colors hover:bg-[#1a1a1a]/80"
                 >
-                  {/* Index */}
-                  <td className="py-2.5 px-3 text-center text-[#5e5d59] font-mono text-[11px]">
+                  <td className="px-3 py-2.5 text-center font-mono text-[11px] text-[#5e5d59]">
                     {index + 1}
                   </td>
-
-                  {/* Status */}
-                  <td className="py-2.5 px-3 whitespace-nowrap">
+                  <td className="px-3 py-2.5 whitespace-nowrap">
                     <div className="flex items-center gap-1.5">
                       {getItemStatusIcon(item.status)}
                       <span className="text-[12px] text-[#eeeeee]">
@@ -82,53 +82,45 @@ export function UrlTable({ items, emptyMessage = 'Нет ссылок с выб�
                       </span>
                     </div>
                   </td>
-
-                  {/* URL + Copy Action */}
-                  <td className="py-2.5 px-3 font-mono text-[12px] text-[#eeeeee] max-w-[280px]">
-                    <div className="flex items-center gap-1.5 justify-between">
+                  <td className="max-w-[280px] px-3 py-2.5 font-mono text-[12px] text-[#eeeeee]">
+                    <div className="flex items-center justify-between gap-1.5">
                       <a
                         href={item.url}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="inline-flex items-center gap-1.5 hover:text-[#2b7fff] hover:underline transition-colors truncate"
+                        className="inline-flex items-center gap-1.5 truncate transition-colors hover:text-[#2b7fff] hover:underline"
                       >
                         <span className="truncate">{item.url}</span>
-                        <ExternalLink className="w-3 h-3 text-[#5e5d59] group-hover:text-[#2b7fff] shrink-0" />
+                        <ExternalLink className="h-3 w-3 shrink-0 text-[#5e5d59] group-hover:text-[#2b7fff]" />
                       </a>
                       <CopyButton
                         text={item.url}
                         label=""
                         showTooltip={true}
                         iconClassName="w-3 h-3"
-                        className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity shrink-0"
+                        className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
                       />
                     </div>
                   </td>
-
-                  {/* HTTP Code */}
-                  <td className="py-2.5 px-3 whitespace-nowrap">
+                  <td className="px-3 py-2.5 whitespace-nowrap">
                     {item.httpCode ? (
                       <span
                         className={cn(
-                          'px-1.5 py-0.5 rounded-[3px] font-mono text-[11px] font-semibold border',
-                          getHttpCodeBadgeClass(item.httpCode)
+                          'rounded-[3px] border px-1.5 py-0.5 font-mono text-[11px] font-semibold',
+                          getHttpCodeBadgeClass(item.httpCode),
                         )}
                       >
                         {item.httpCode}
                       </span>
                     ) : (
-                      <span className="text-[#5e5d59] font-mono text-[11px]">—</span>
+                      <span className="font-mono text-[11px] text-[#5e5d59]">—</span>
                     )}
                   </td>
-
-                  {/* Duration */}
-                  <td className="py-2.5 px-3 text-right font-mono text-[11px] text-[#a4a19b] whitespace-nowrap">
+                  <td className="px-3 py-2.5 text-right font-mono text-[11px] whitespace-nowrap text-[#a4a19b]">
                     {item.duration !== undefined ? `${item.duration} мс` : '—'}
                   </td>
-
-                  {/* Error message */}
                   <td
-                    className="py-2.5 px-3 text-[11px] font-mono text-[#f87171] truncate max-w-[160px]"
+                    className="max-w-[160px] truncate px-3 py-2.5 font-mono text-[11px] text-[#f87171]"
                     title={item.errorMessage || ''}
                   >
                     {item.errorMessage || <span className="text-[#5e5d59]">—</span>}

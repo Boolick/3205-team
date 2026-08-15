@@ -27,9 +27,9 @@ export function CancelJobButton({ className }: CancelJobButtonProps) {
         size="sm"
         onClick={() => setIsOpen(true)}
         disabled={isCancellingJob}
-        className={className || 'gap-1.5 shrink-0 self-start sm:self-auto'}
+        className={className || 'shrink-0 gap-1.5 self-start sm:self-auto'}
       >
-        <ShieldAlert className="w-4 h-4" />
+        <ShieldAlert className="h-4 w-4" />
         <span>Отменить проверку</span>
       </Button>
 

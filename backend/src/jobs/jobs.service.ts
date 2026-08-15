@@ -1,15 +1,9 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { Cron, CronExpression } from "@nestjs/schedule";
-import { randomUUID } from "crypto";
-import {
-  Job,
-  JobItem,
-  JobStatus,
-  JobItemStatus,
-  JobSummary,
-} from "./interfaces/job.interface";
-import { AsyncSemaphore } from "./utils/async-semaphore.util";
-import { checkUrl } from "./utils/url-checker.util";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { randomUUID } from 'crypto';
+import { Job, JobItem, JobStatus, JobItemStatus, JobSummary } from './interfaces/job.interface';
+import { AsyncSemaphore } from './utils/async-semaphore.util';
+import { checkUrl } from './utils/url-checker.util';
 
 @Injectable()
 export class JobsService {
@@ -40,10 +34,7 @@ export class JobsService {
     this.abortControllers.set(jobId, controller);
     this.createdTimestamps.set(jobId, timestamp);
 
-    // Asynchronously process job in background
-    this.processJobInBackground(jobId, controller).catch(() => {
-      // Errors handled internally per item
-    });
+    this.processJobInBackground(jobId, controller).catch(() => {});
 
     return { jobId };
   }
@@ -73,10 +64,7 @@ export class JobsService {
       });
     }
 
-    return list.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
+    return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   getJobById(id: string): Job {
@@ -99,10 +87,7 @@ export class JobsService {
     job.status = JobStatus.CANCELLED;
 
     for (const item of job.items) {
-      if (
-        item.status === JobItemStatus.PENDING ||
-        item.status === JobItemStatus.IN_PROGRESS
-      ) {
+      if (item.status === JobItemStatus.PENDING || item.status === JobItemStatus.IN_PROGRESS) {
         item.status = JobItemStatus.CANCELLED;
       }
     }
@@ -110,10 +95,7 @@ export class JobsService {
     return job;
   }
 
-  private async processJobInBackground(
-    jobId: string,
-    controller: AbortController,
-  ): Promise<void> {
+  private async processJobInBackground(jobId: string, controller: AbortController): Promise<void> {
     const job = this.jobs.get(jobId);
     if (!job) return;
 
@@ -147,18 +129,15 @@ export class JobsService {
         item.duration = result.duration;
         item.httpCode = result.httpCode;
         item.errorMessage = result.errorMessage;
-        item.status =
-          result.status === "success"
-            ? JobItemStatus.SUCCESS
-            : JobItemStatus.ERROR;
+        item.status = result.status === 'success' ? JobItemStatus.SUCCESS : JobItemStatus.ERROR;
       } catch (error: unknown) {
         item.finishedAt = new Date().toISOString();
         const err = error as Error | undefined;
-        if (controller.signal.aborted || err?.message === "Operation aborted") {
+        if (controller.signal.aborted || err?.message === 'Operation aborted') {
           item.status = JobItemStatus.CANCELLED;
         } else {
           item.status = JobItemStatus.ERROR;
-          item.errorMessage = err?.message || "Check failed";
+          item.errorMessage = err?.message || 'Check failed';
         }
       } finally {
         semaphore.release();
@@ -167,17 +146,13 @@ export class JobsService {
 
     await Promise.allSettled(promises);
 
-    if (
-      (job.status as JobStatus) === JobStatus.CANCELLED ||
-      controller.signal.aborted
-    ) {
+    if ((job.status as JobStatus) === JobStatus.CANCELLED || controller.signal.aborted) {
       job.status = JobStatus.CANCELLED;
       return;
     }
 
     const allFailed =
-      job.items.length > 0 &&
-      job.items.every((i) => i.status === JobItemStatus.ERROR);
+      job.items.length > 0 && job.items.every((i) => i.status === JobItemStatus.ERROR);
     job.status = allFailed ? JobStatus.FAILED : JobStatus.COMPLETED;
     this.abortControllers.delete(jobId);
   }
