@@ -20,17 +20,30 @@ export const badgeVariants = cva(
     defaultVariants: {
       status: 'neutral',
     },
-  }
+  },
 );
 
 export interface BadgeProps
-  extends HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeVariants> {
-  status?: 'pending' | 'in_progress' | 'completed' | 'success' | 'failed' | 'error' | 'cancelled' | 'neutral';
+  extends HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {
+  status?:
+    | 'pending'
+    | 'in_progress'
+    | 'completed'
+    | 'success'
+    | 'failed'
+    | 'error'
+    | 'cancelled'
+    | 'neutral';
   dot?: boolean;
 }
 
-export function Badge({ className, status = 'neutral', dot = true, children, ...props }: BadgeProps) {
+export function Badge({
+  className,
+  status = 'neutral',
+  dot = true,
+  children,
+  ...props
+}: BadgeProps) {
   const showDot = dot && status !== 'neutral';
 
   return (
@@ -38,16 +51,16 @@ export function Badge({ className, status = 'neutral', dot = true, children, ...
       {showDot && (
         <span className="relative flex h-1.5 w-1.5 shrink-0">
           {status === 'in_progress' && (
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2b7fff] opacity-75" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2b7fff] opacity-75" />
           )}
           <span
             className={cn(
-              'relative inline-flex rounded-full h-1.5 w-1.5',
+              'relative inline-flex h-1.5 w-1.5 rounded-full',
               status === 'in_progress' && 'bg-[#2b7fff]',
               status === 'pending' && 'bg-[#a4a19b]',
               (status === 'completed' || status === 'success') && 'bg-[#4ade80]',
               (status === 'failed' || status === 'error') && 'bg-[#f87171]',
-              status === 'cancelled' && 'bg-[#5e5d59]'
+              status === 'cancelled' && 'bg-[#5e5d59]',
             )}
           />
         </span>

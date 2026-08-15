@@ -26,60 +26,60 @@ export function JobDetails() {
   const [selectedFilter, setSelectedFilter] = useState<FilterStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter items using the extracted feature helper
   const counts = useMemo(
-    () => (activeJob ? getJobUrlCounts(activeJob.items) : { all: 0, success: 0, error: 0, in_progress: 0, pending: 0, cancelled: 0 }),
-    [activeJob]
+    () =>
+      activeJob
+        ? getJobUrlCounts(activeJob.items)
+        : { all: 0, success: 0, error: 0, in_progress: 0, pending: 0, cancelled: 0 },
+    [activeJob],
   );
 
   const filteredItems = useMemo(
     () => (activeJob ? filterJobUrls(activeJob.items, selectedFilter, searchQuery) : []),
-    [activeJob, selectedFilter, searchQuery]
+    [activeJob, selectedFilter, searchQuery],
   );
 
-  // 1. Loading State when changing active job
   if (isLoadingActiveJob && !activeJob) {
     return (
-      <div className="bg-[#1f1f1f] border border-[#262626] rounded-[8px] p-6 shadow-sm min-h-[460px] animate-pulse space-y-6">
-        <div className="flex items-center justify-between pb-4 border-b border-[#262626]">
+      <div className="min-h-[460px] animate-pulse space-y-6 rounded-[8px] border border-[#262626] bg-[#1f1f1f] p-6 shadow-sm">
+        <div className="flex items-center justify-between border-b border-[#262626] pb-4">
           <div className="space-y-2">
-            <div className="w-48 h-5 bg-[#262626] rounded-[4px]" />
-            <div className="w-64 h-3 bg-[#262626] rounded-[3px]" />
+            <div className="h-5 w-48 rounded-[4px] bg-[#262626]" />
+            <div className="h-3 w-64 rounded-[3px] bg-[#262626]" />
           </div>
-          <div className="w-24 h-7 bg-[#262626] rounded-[4px]" />
+          <div className="h-7 w-24 rounded-[4px] bg-[#262626]" />
         </div>
         <div className="grid grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-16 bg-[#262626] rounded-[6px]" />
+            <div key={i} className="h-16 rounded-[6px] bg-[#262626]" />
           ))}
         </div>
-        <div className="h-64 bg-[#262626] rounded-[6px]" />
+        <div className="h-64 rounded-[6px] bg-[#262626]" />
       </div>
     );
   }
 
-  // 2. Empty State (No Active Job Selected)
   if (!activeJob) {
     return (
-      <div className="bg-[#1f1f1f] border border-[#262626] rounded-[8px] p-8 shadow-sm min-h-[460px] flex flex-col items-center justify-center text-center">
-        <div className="p-4 rounded-full bg-[#111111] border border-[#262626] text-[#2b7fff] mb-4 shadow-inner">
-          <Activity className="w-8 h-8 opacity-80" />
+      <div className="flex min-h-[460px] flex-col items-center justify-center rounded-[8px] border border-[#262626] bg-[#1f1f1f] p-8 text-center shadow-sm">
+        <div className="mb-4 rounded-full border border-[#262626] bg-[#111111] p-4 text-[#2b7fff] shadow-inner">
+          <Activity className="h-8 w-8 opacity-80" />
         </div>
-        <h2 className="font-serif text-[18px] text-[#eeeeee] mb-2 font-medium">
+        <h2 className="mb-2 font-serif text-[18px] font-medium text-[#eeeeee]">
           Задача не выбрана
         </h2>
-        <p className="text-[13px] text-[#a4a19b] max-w-[360px] leading-relaxed mb-6">
-          Выберите задание из истории проверок слева или вставьте список URL в форму для запуска новой проверки.
+        <p className="mb-6 max-w-[360px] text-[13px] leading-relaxed text-[#a4a19b]">
+          Выберите задание из истории проверок слева или вставьте список URL в форму для запуска
+          новой проверки.
         </p>
-        <div className="flex items-center gap-2 text-[12px] font-mono text-[#5e5d59] bg-[#111111] px-3 py-1.5 rounded-[4px] border border-[#262626]">
-          <Sparkles className="w-3.5 h-3.5 text-[#2b7fff]" />
+        <div className="flex items-center gap-2 rounded-[4px] border border-[#262626] bg-[#111111] px-3 py-1.5 font-mono text-[12px] text-[#5e5d59]">
+          <Sparkles className="h-3.5 w-3.5 text-[#2b7fff]" />
           <span>Поддерживается до 5 параллельных запросов на задачу</span>
         </div>
       </div>
     );
   }
 
-  // Calculate summary metrics
   const total = activeJob.items.length;
   const successCount = counts.success;
   const errorCount = counts.error;
@@ -87,81 +87,71 @@ export function JobDetails() {
   const pendingCount = counts.pending;
 
   return (
-    <div className="bg-[#1f1f1f] border border-[#262626] rounded-[8px] p-6 shadow-sm space-y-6 transition-all duration-200">
-      {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#262626]">
+    <div className="space-y-6 rounded-[8px] border border-[#262626] bg-[#1f1f1f] p-6 shadow-sm transition-all duration-200">
+      <div className="flex flex-col justify-between gap-4 border-b border-[#262626] pb-5 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <h2 className="font-serif text-[18px] text-[#eeeeee] font-medium">
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="font-serif text-[18px] font-medium text-[#eeeeee]">
               {STATUS_TITLES[activeJob.status] || 'Детализация проверки'}
             </h2>
-            <Badge status={activeJob.status}>
-              {activeJob.status}
-            </Badge>
+            <Badge status={activeJob.status}>{activeJob.status}</Badge>
           </div>
-          <div className="flex items-center gap-2 mt-1.5">
-            <span className="text-[12px] font-mono text-[#a4a19b]">
-              ID: {activeJob.id}
-            </span>
+          <div className="mt-1.5 flex items-center gap-2">
+            <span className="font-mono text-[12px] text-[#a4a19b]">ID: {activeJob.id}</span>
             <CopyButton text={activeJob.id} label="" showTooltip={true} />
           </div>
         </div>
 
-        {/* Feature: Cancel Job Action */}
         <CancelJobButton />
       </div>
 
-      {/* Multi-Segment Progress Bar */}
       <ProgressBar items={activeJob.items} jobStatus={activeJob.status} />
 
-      {/* 4 Metric Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div className="bg-[#111111] border border-[#262626] p-3 rounded-[6px]">
-          <span className="text-[11px] font-mono text-[#a4a19b] uppercase tracking-wider block">
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+        <div className="rounded-[6px] border border-[#262626] bg-[#111111] p-3">
+          <span className="block font-mono text-[11px] tracking-wider text-[#a4a19b] uppercase">
             Всего ссылок
           </span>
-          <span className="text-[18px] font-mono font-medium text-[#eeeeee] mt-0.5 block">
+          <span className="mt-0.5 block font-mono text-[18px] font-medium text-[#eeeeee]">
             {total}
           </span>
         </div>
 
-        <div className="bg-[#111111] border border-[#1d4d33] p-3 rounded-[6px]">
-          <span className="text-[11px] font-mono text-[#4ade80] uppercase tracking-wider block">
+        <div className="rounded-[6px] border border-[#1d4d33] bg-[#111111] p-3">
+          <span className="block font-mono text-[11px] tracking-wider text-[#4ade80] uppercase">
             Успешно (2xx)
           </span>
-          <span className="text-[18px] font-mono font-medium text-[#4ade80] mt-0.5 block">
+          <span className="mt-0.5 block font-mono text-[18px] font-medium text-[#4ade80]">
             {successCount}
           </span>
         </div>
 
-        <div className="bg-[#111111] border border-[#5c1d24] p-3 rounded-[6px]">
-          <span className="text-[11px] font-mono text-[#f87171] uppercase tracking-wider block">
+        <div className="rounded-[6px] border border-[#5c1d24] bg-[#111111] p-3">
+          <span className="block font-mono text-[11px] tracking-wider text-[#f87171] uppercase">
             Ошибки
           </span>
-          <span className="text-[18px] font-mono font-medium text-[#f87171] mt-0.5 block">
+          <span className="mt-0.5 block font-mono text-[18px] font-medium text-[#f87171]">
             {errorCount}
           </span>
         </div>
 
-        <div className="bg-[#111111] border border-[#262626] p-3 rounded-[6px]">
-          <span className="text-[11px] font-mono text-[#a4a19b] uppercase tracking-wider block">
+        <div className="rounded-[6px] border border-[#262626] bg-[#111111] p-3">
+          <span className="block font-mono text-[11px] tracking-wider text-[#a4a19b] uppercase">
             В очереди / Процессе
           </span>
-          <span className="text-[18px] font-mono font-medium text-[#eeeeee] mt-0.5 block">
+          <span className="mt-0.5 block font-mono text-[18px] font-medium text-[#eeeeee]">
             {inProgressCount + pendingCount}
           </span>
         </div>
       </div>
 
-      {/* URL Verification Table with Feature Filter Bar */}
       <div className="space-y-3.5">
         <div className="flex items-center justify-between">
-          <h3 className="font-serif text-[15px] text-[#eeeeee] font-medium">
+          <h3 className="font-serif text-[15px] font-medium text-[#eeeeee]">
             Результаты проверки ссылок
           </h3>
         </div>
 
-        {/* Feature: Filter Bar */}
         <UrlFilterBar
           selectedFilter={selectedFilter}
           searchQuery={searchQuery}
@@ -170,7 +160,6 @@ export function JobDetails() {
           onSearchChange={setSearchQuery}
         />
 
-        {/* Table View */}
         <UrlTable
           items={filteredItems}
           emptyMessage={

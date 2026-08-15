@@ -3,6 +3,8 @@ import tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
 import checkFile from 'eslint-plugin-check-file';
 import boundaries from 'eslint-plugin-boundaries';
+import prettierConfig from 'eslint-config-prettier';
+import prettierPlugin from 'eslint-plugin-prettier';
 
 export default tseslint.config(
   {
@@ -16,6 +18,7 @@ export default tseslint.config(
       'react-hooks': reactHooks,
       'check-file': checkFile,
       boundaries: boundaries,
+      prettier: prettierPlugin,
     },
     settings: {
       'boundaries/include': ['src/**/*'],
@@ -30,8 +33,18 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      ...prettierConfig.rules,
+      'prettier/prettier': [
+        'error',
+        {
+          singleQuote: true,
+          trailingComma: 'all',
+          semi: true,
+          printWidth: 100,
+          tabWidth: 2,
+        },
+      ],
 
-      // 1. Strict Kebab-Case File and Directory Naming
       'check-file/filename-naming-convention': [
         'error',
         {
@@ -48,7 +61,6 @@ export default tseslint.config(
         },
       ],
 
-      // 2. FSD Layer Hierarchy and Boundary Rules (v7 syntax)
       'boundaries/dependencies': [
         'error',
         {
@@ -91,21 +103,16 @@ export default tseslint.config(
             },
             {
               from: { element: { type: 'entities' } },
-              allow: [
-                { to: { element: { type: 'shared' } } },
-              ],
+              allow: [{ to: { element: { type: 'shared' } } }],
             },
             {
               from: { element: { type: 'shared' } },
-              allow: [
-                { to: { element: { type: 'shared' } } },
-              ],
+              allow: [{ to: { element: { type: 'shared' } } }],
             },
           ],
         },
       ],
 
-      // 3. React and TypeScript Best Practices
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
@@ -115,5 +122,5 @@ export default tseslint.config(
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
     },
-  }
+  },
 );

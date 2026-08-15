@@ -16,7 +16,6 @@ interface JobState {
   error: string | null;
   toasts: ToastItem[];
 
-  // Actions
   setActiveJobId: (id: string | null) => void;
   fetchJobs: (signal?: AbortSignal) => Promise<void>;
   fetchActiveJob: (id?: string, signal?: AbortSignal, silent?: boolean) => Promise<void>;
@@ -71,20 +70,19 @@ export const useJobStore = create<JobState>()(
         const targetId = id || get().activeJobId;
         if (!targetId) return;
 
-        // If not silent or activeJob not yet loaded, set loading state
         if (!silent && (!get().activeJob || get().activeJob?.id !== targetId)) {
           set({ isLoadingActiveJob: true });
         }
         try {
           const activeJob = await jobApi.getJobById(targetId, signal);
-          // ID Guarding: ensure response matches currently active job ID
           if (get().activeJobId === targetId) {
             set({ activeJob, isLoadingActiveJob: false, error: null });
           }
         } catch (err) {
           if (signal?.aborted) return;
           if (get().activeJobId === targetId) {
-            const msg = err instanceof ApiError ? err.message : 'Не удалось получить данные задания';
+            const msg =
+              err instanceof ApiError ? err.message : 'Не удалось получить данные задания';
             set({ isLoadingActiveJob: false, error: msg });
           }
         }
@@ -150,6 +148,6 @@ export const useJobStore = create<JobState>()(
       name: 'altitude-active-job',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ activeJobId: state.activeJobId }),
-    }
-  )
+    },
+  ),
 );
